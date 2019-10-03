@@ -14,6 +14,8 @@
 		4CF9A32023899708009665E8 /* JacquardNeoVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CF9A31F23899708009665E8 /* JacquardNeoVC.swift */; };
 		4CF9A3222389984C009665E8 /* GestureTrie.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CF9A3212389984C009665E8 /* GestureTrie.swift */; };
 		B1D332F78A51415A75857B85 /* Pods_JacquardNeo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F3ACE1A3A884A3539DF2EA3 /* Pods_JacquardNeo.framework */; };
+		EA5FEE352346387A0011D51E /* Spotify.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA5FEE342346387A0011D51E /* Spotify.swift */; };
+		EA5FEE3723463A130011D51E /* SpotifyiOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA5FEE3623463A130011D51E /* SpotifyiOS.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +30,9 @@
 		4CF9A3212389984C009665E8 /* GestureTrie.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GestureTrie.swift; sourceTree = "<group>"; };
 		4F3ACE1A3A884A3539DF2EA3 /* Pods_JacquardNeo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_JacquardNeo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4F68EDB073DB5FD7A032840D /* Pods-JacquardNeo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-JacquardNeo.release.xcconfig"; path = "Target Support Files/Pods-JacquardNeo/Pods-JacquardNeo.release.xcconfig"; sourceTree = "<group>"; };
+		EA5FEE342346387A0011D51E /* Spotify.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spotify.swift; sourceTree = "<group>"; };
+		EA5FEE3623463A130011D51E /* SpotifyiOS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SpotifyiOS.framework; sourceTree = "<group>"; };
+		EA5FEE38234641050011D51E /* JacquardNeo-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "JacquardNeo-Bridging-Header.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -36,6 +41,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B1D332F78A51415A75857B85 /* Pods_JacquardNeo.framework in Frameworks */,
+				EA5FEE3723463A130011D51E /* SpotifyiOS.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,7 +71,9 @@
 			children = (
 				4CF9A30B2389961A009665E8 /* AppDelegate.swift */,
 				4CF9A30D2389961A009665E8 /* SceneDelegate.swift */,
+				EA5FEE38234641050011D51E /* JacquardNeo-Bridging-Header.h */,
 				4CF9A3212389984C009665E8 /* GestureTrie.swift */,
+				EA5FEE342346387A0011D51E /* Spotify.swift */,
 				4CF9A31F23899708009665E8 /* JacquardNeoVC.swift */,
 				4CF9A3142389961C009665E8 /* Assets.xcassets */,
 				4CF9A3162389961C009665E8 /* LaunchScreen.storyboard */,
@@ -77,6 +85,7 @@
 		ADFB7D9FFB000ED8D543D302 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				EA5FEE3623463A130011D51E /* SpotifyiOS.framework */,
 				4F3ACE1A3A884A3539DF2EA3 /* Pods_JacquardNeo.framework */,
 			);
 			name = Frameworks;
@@ -125,6 +134,7 @@
 				TargetAttributes = {
 					4CF9A3072389961A009665E8 = {
 						CreatedOnToolsVersion = 11.2.1;
+						LastSwiftMigration = 1100;
 					};
 				};
 			};
@@ -206,6 +216,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4CF9A32023899708009665E8 /* JacquardNeoVC.swift in Sources */,
+				EA5FEE352346387A0011D51E /* Spotify.swift in Sources */,
 				4CF9A30C2389961A009665E8 /* AppDelegate.swift in Sources */,
 				4CF9A30E2389961A009665E8 /* SceneDelegate.swift in Sources */,
 				4CF9A3222389984C009665E8 /* GestureTrie.swift in Sources */,
@@ -345,16 +356,29 @@
 			baseConfigurationReference = 3A3733BA22D24C23E1E97D4D /* Pods-JacquardNeo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = HW2DL7UPC8;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = JacquardNeo/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"$(inherited)",
+					"-framework",
+					"\"JacquardToolkit\"",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.Koohang.JacquardNeo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "JacquardNeo-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -365,16 +389,28 @@
 			baseConfigurationReference = 4F68EDB073DB5FD7A032840D /* Pods-JacquardNeo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = HW2DL7UPC8;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = JacquardNeo/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"$(inherited)",
+					"-framework",
+					"\"JacquardToolkit\"",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.Koohang.JacquardNeo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "JacquardNeo-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
