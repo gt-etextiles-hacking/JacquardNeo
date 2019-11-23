@@ -1,0 +1,16 @@
+PODS:
+  - JacquardToolkit (1.3)
+
+DEPENDENCIES:
+  - JacquardToolkit
+
+SPEC REPOS:
+  trunk:
+    - JacquardToolkit
+
+SPEC CHECKSUMS:
+  JacquardToolkit: eca94f82149f14d0139ccb511e3a55ea2d8dc405
+
+PODFILE CHECKSUM: 66f500419527f1076fe85ca1f208d07916a902f6
+
+COCOAPODS: 1.8.4
