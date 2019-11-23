@@ -250,12 +250,55 @@ extension JacquardNeoVC: JacquardServiceDelegate {
             gestureHistoryConsumtionTimer = Timer.scheduledTimer(withTimeInterval: GESTURE_HISTORY_CONSUMTION_DELAY, repeats: true, block: { (timer) in
                 if self.gestureHistory.count > 0 {
                     print("GESTURE HISTORY:", self.gestureHistory)
+                    
                 }
                 if NSSet(array: self.gestureHistory).count > 1 {
-                    let diff = self.gestureHistory.diff()
-                    let delta = diff.reduce(0, { (result, delta) -> Int in
-                        return result + delta
-                    })
+                    
+//                    if self.direction == .none {
+//                        if self.gestureHistory.count > 0 {
+//                            let start = self.gestureHistory[0]
+//                            for i in 1..<self.gestureHistory.count {
+//                                if (self.gestureHistory[i] != start) {
+//                                    let end = self.gestureHistory[i]
+//                                    if start == 1 && end == 3 {
+//                                        self.direction = .anticlockwise
+//                                        break
+//                                    } else if start == 3 && end == 1 {
+//                                        self.direction = .clockwise
+//                                    } else if start < end {
+//                                        self.direction = .clockwise
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+                    
+                    var delta = 0
+                    
+                    for i in 1..<self.gestureHistory.count {
+                        let start = self.gestureHistory[i-1]
+                        let end = self.gestureHistory[i]
+                        print("\(start) >  \(end)")
+                        if abs(end - start) != 1 && end != start {
+                            if start > end {
+                                //CLOCKWISE
+                                print("Clockwise: \(start) > \(end)")
+                                delta += 1
+                            } else {
+                                //ANTI CLOCKWISE
+                                print("Anti Clockwise: \(start) > \(end)")
+                                delta -= 1
+                            }
+                        } else {
+                            print("DELTA: \((end - start))")
+                            delta += (end - start)
+                        }
+                    }
+                    
+//                    let diff = self.gestureHistory.diff()
+//                    let delta = diff.reduce(0, { (result, delta) -> Int in
+//                        return result + delta
+//                    })
                     print("Delta \(delta)")
                 }
                 self.gestureHistory.removeAll()
@@ -267,7 +310,7 @@ extension JacquardNeoVC: JacquardServiceDelegate {
             print("GESTURE OVER")
             self.isGestureActive = false
             self.gestureHistoryConsumtionTimer?.invalidate()
-            print("Unique Touch Zones: \(self.uniqueTouchedZones)")
+//            print("Unique Touch Zones: \(self.uniqueTouchedZones)")
             if self.uniqueTouchedZones.count == 1 {
                 print("Tapped Zone \(self.uniqueTouchedZones[0])")
             }
