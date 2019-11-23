@@ -25,6 +25,13 @@ class JacquardNeoVC: UIViewController {
         return result
     }()
     var threadChunkArray: [[Float]] = []
+    var gestureHistory: [Int] = []
+    var gestureResetTimer: Timer?
+    var gestureHistoryConsumtionTimer: Timer?
+    var isGestureActive = false
+    var GESTURE_END_DELAY = 0.1
+    var GESTURE_HISTORY_CONSUMTION_DELAY = 0.4
+    var uniqueTouchedZones: [Int] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -236,10 +243,58 @@ extension JacquardNeoVC: JacquardServiceDelegate {
     }
     
     func didDetectThreadTouch(threadArray: [Float]) {
+        if let gestureResetTimer = gestureResetTimer {
+            gestureResetTimer.invalidate()
+        }
+        if !isGestureActive {
+            gestureHistoryConsumtionTimer = Timer.scheduledTimer(withTimeInterval: GESTURE_HISTORY_CONSUMTION_DELAY, repeats: true, block: { (timer) in
+                if self.gestureHistory.count > 0 {
+                    print("GESTURE HISTORY:", self.gestureHistory)
+                }
+                if NSSet(array: self.gestureHistory).count > 1 {
+                    let diff = self.gestureHistory.diff()
+                    let delta = diff.reduce(0, { (result, delta) -> Int in
+                        return result + delta
+                    })
+                    print("Delta \(delta)")
+                }
+                self.gestureHistory.removeAll()
+            })
+        }
         
+        isGestureActive = true
+        gestureResetTimer = Timer.scheduledTimer(withTimeInterval: GESTURE_END_DELAY, repeats: false, block: { (timer) in
+            print("GESTURE OVER")
+            self.isGestureActive = false
+            self.gestureHistoryConsumtionTimer?.invalidate()
+            print("Unique Touch Zones: \(self.uniqueTouchedZones)")
+            if self.uniqueTouchedZones.count == 1 {
+                print("Tapped Zone \(self.uniqueTouchedZones[0])")
+            }
+            self.uniqueTouchedZones.removeAll()
+        })
         if threadChunkArray.count == 5 {
             let group = groupDetector(input: &threadChunkArray)
-            print(group + "\n")
+//            print(group + "\n")
+            switch group {
+            case "Left":
+                gestureHistory.append(1)
+                if !uniqueTouchedZones.contains(1) {
+                    uniqueTouchedZones.append(1)
+                }
+            case "Right":
+                gestureHistory.append(3)
+                if !uniqueTouchedZones.contains(3) {
+                    uniqueTouchedZones.append(3)
+                }
+            case "Center":
+                gestureHistory.append(2)
+                if !uniqueTouchedZones.contains(2) {
+                    uniqueTouchedZones.append(2)
+                }
+            default:
+                break
+            }
 //            if string.count < 3 {
 //                if group != "" {
 //                    if string.last != Character(group) {
@@ -281,4 +336,14 @@ extension JacquardNeoVC: JacquardServiceDelegate {
         }
     }
 
+}
+
+extension Collection where Element: SignedNumeric {
+    func diff() -> [Element] {
+        guard var last = first else { return [] }
+        return dropFirst().reduce(into: []) {
+            $0.append($1 - last)
+            last = $1
+        }
+    }
 }
