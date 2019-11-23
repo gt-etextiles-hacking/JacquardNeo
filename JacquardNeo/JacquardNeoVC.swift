@@ -169,7 +169,7 @@ class JacquardNeoVC: UIViewController {
         }
     
         let maxValue = output.max() != 0 ? output.max() : -1
-        switch output.index(of: maxValue!) {
+        switch output.firstIndex(of: maxValue!) {
         case 0:
             self.gestureLabel.text = "RIGHT"
             return "Right"
@@ -209,7 +209,7 @@ class JacquardNeoVC: UIViewController {
     
 }
 
-extension JacquardVC: JacquardServiceDelegate {
+extension JacquardNeoVC: JacquardServiceDelegate {
     
     func didDetectDoubleTapGesture() {
         gestureLabel.text = "Double Tap"
