@@ -8,6 +8,7 @@
 
 import UIKit
 import JacquardToolkit
+import MediaPlayer
 
 class JacquardNeoVC: UIViewController {
         
@@ -32,6 +33,13 @@ class JacquardNeoVC: UIViewController {
     var GESTURE_END_DELAY = 0.1
     var GESTURE_HISTORY_CONSUMTION_DELAY = 0.4
     var uniqueTouchedZones: [Int] = []
+    
+    enum State {
+        case volumeControl
+        case brightnessControl
+    }
+    
+    var state: State = State.brightnessControl
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -163,12 +171,18 @@ class JacquardNeoVC: UIViewController {
             self.rainbowGlowButton.transform = CGAffineTransform(scaleX: 1.5, y: 1.5)
             self.rainbowGlowButton.transform = CGAffineTransform(scaleX: 1, y: 1)
         }
-        JacquardService.shared.rainbowGlowJacket()
+        state = state == State.brightnessControl ? State.volumeControl  : State.brightnessControl
+        switch state {
+        case State.brightnessControl:
+            rainbowGlowButton.titleLabel?.text = "Brightness"
+        case State.volumeControl:
+            rainbowGlowButton.titleLabel?.text = "Volume"
+        }
     }
     
     func groupDetector(input: inout [[Float]]) -> String {
             
-        var output: [Float] = [0.0, 0.0, 0.0]
+        var output: [Float] = [0.0, 0.0, 0.0, 0.0]
         for i in 0..<input.count {
             for j in 0..<input[i].count {
                 dfs(input: &input, i: i, j: j, output: &output)
@@ -178,14 +192,17 @@ class JacquardNeoVC: UIViewController {
         let maxValue = output.max() != 0 ? output.max() : -1
         switch output.firstIndex(of: maxValue!) {
         case 0:
-            self.gestureLabel.text = "RIGHT"
-            return "Right"
+            self.gestureLabel.text = "TOP"
+            return "TOP"
         case 1:
-            self.gestureLabel.text = "CENTER"
-            return "Center"
+            self.gestureLabel.text = "RIGHT"
+            return "RIGHT"
         case 2:
+            self.gestureLabel.text = "BOTTOM"
+            return "BOTTOM"
+        case 3:
             self.gestureLabel.text = "LEFT"
-            return "Left"
+            return "LEFT"
         default:
             break
         
@@ -197,12 +214,14 @@ class JacquardNeoVC: UIViewController {
     func dfs(input: inout [[Float]], i: Int, j: Int, output: inout [Float]) {
         if i >= 0 && i < input.count && j >= 0 && j < input[i].count && input[i][j] != 0 {
             
-            if j <= 5 {
+            if j <= 2 {
                 output[0] += 1
-            } else if j <= 10 {
+            } else if j <= 4 {
                 output[1] += 1
-            } else {
+            } else if j <= 6 {
                 output[2] += 1
+            } else {
+                output[3] += 1
             }
             
             input[i][j] = 0
@@ -282,15 +301,15 @@ extension JacquardNeoVC: JacquardServiceDelegate {
                         if abs(end - start) != 1 && end != start {
                             if start > end {
                                 //CLOCKWISE
-                                print("Clockwise: \(start) > \(end)")
+//                                print("Clockwise: \(start) > \(end)")
                                 delta += 1
                             } else {
                                 //ANTI CLOCKWISE
-                                print("Anti Clockwise: \(start) > \(end)")
+//                                print("Anti Clockwise: \(start) > \(end)")
                                 delta -= 1
                             }
                         } else {
-                            print("DELTA: \((end - start))")
+//                            print("DELTA: \((end - start))")
                             delta += (end - start)
                         }
                     }
@@ -300,6 +319,13 @@ extension JacquardNeoVC: JacquardServiceDelegate {
 //                        return result + delta
 //                    })
                     print("Delta \(delta)")
+                    switch self.state {
+                    case State.volumeControl:
+                        print(Float(delta)/3.0)
+                        MPVolumeView.setVolume(Float(delta)/3.0)
+                    case State.brightnessControl:
+                        UIScreen.main.brightness = CGFloat(Float(delta)/3.0)
+                    }
                 }
                 self.gestureHistory.removeAll()
             })
@@ -387,6 +413,24 @@ extension Collection where Element: SignedNumeric {
         return dropFirst().reduce(into: []) {
             $0.append($1 - last)
             last = $1
+        }
+    }
+}
+
+extension MPVolumeView {
+    static func setVolume(_ volume: Float) {
+        // Need to use the MPVolumeView in order to change volume, but don't care about UI set so frame to .zero
+        let volumeView = MPVolumeView(frame: .zero)
+        // Search for the slider
+        let slider = volumeView.subviews.first(where: { $0 is UISlider }) as? UISlider
+        // Update the slider value with the desired volume.
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.01) {
+            slider?.value = volume
+        }
+        // Optional - Remove the HUD
+        if let app = UIApplication.shared.delegate as? SceneDelegate, let window = app.window {
+            volumeView.alpha = 0.000001
+            window.addSubview(volumeView)
         }
     }
 }
