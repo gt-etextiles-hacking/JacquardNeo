@@ -60,5 +60,7 @@
 	<string>The camera access is needed to scan Jacquard QR Code</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>The app needs bluetooth access to talk with the Jacquard Tag.</string>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>The app will play your music with gestures from Jacquard tag.</string>
 </dict>
 </plist>

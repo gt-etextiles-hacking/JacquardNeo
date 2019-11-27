@@ -33,7 +33,8 @@ class JacquardNeoVC: UIViewController {
     var GESTURE_END_DELAY = 0.1
     var GESTURE_HISTORY_CONSUMTION_DELAY = 0.4
     var uniqueTouchedZones: [Int] = []
-    
+    let musicPlayer = MPMusicPlayerApplicationController.systemMusicPlayer
+
     enum State {
         case volumeControl
         case brightnessControl
@@ -50,6 +51,8 @@ class JacquardNeoVC: UIViewController {
         rainbowGlowButton.addTarget(self, action: #selector(rainbowGlowButtonTapped), for: .touchUpInside)
         connectButton.addTarget(self, action: #selector(connectButtonTapped), for: .touchUpInside)
         setup()
+        musicPlayer.setQueue(with: .songs())
+
     }
     
     // UI Components
@@ -180,7 +183,7 @@ class JacquardNeoVC: UIViewController {
         }
     }
     
-    func groupDetector(input: inout [[Float]]) -> String {
+    func groupDetector(input: inout [[Float]]) -> TouchZone {
             
         var output: [Float] = [0.0, 0.0, 0.0, 0.0]
         for i in 0..<input.count {
@@ -191,34 +194,34 @@ class JacquardNeoVC: UIViewController {
     
         let maxValue = output.max() != 0 ? output.max() : -1
         switch output.firstIndex(of: maxValue!) {
-        case 0:
-            self.gestureLabel.text = "TOP"
-            return "TOP"
-        case 1:
-            self.gestureLabel.text = "RIGHT"
-            return "RIGHT"
-        case 2:
-            self.gestureLabel.text = "BOTTOM"
-            return "BOTTOM"
-        case 3:
-            self.gestureLabel.text = "LEFT"
-            return "LEFT"
+        case TouchZone.Bottom.rawValue:
+            self.gestureLabel.text = "\(TouchZone.Bottom)"
+            return TouchZone.Bottom
+        case TouchZone.Top.rawValue:
+            self.gestureLabel.text = "\(TouchZone.Top)"
+            return TouchZone.Top
+        case TouchZone.Left.rawValue:
+            self.gestureLabel.text = "\(TouchZone.Left)"
+            return TouchZone.Left
+        case TouchZone.Right.rawValue:
+            self.gestureLabel.text = "\(TouchZone.Right)"
+            return TouchZone.Right
         default:
             break
         
         }
         
-        return ""
+        return TouchZone.Top
     }
         
     func dfs(input: inout [[Float]], i: Int, j: Int, output: inout [Float]) {
         if i >= 0 && i < input.count && j >= 0 && j < input[i].count && input[i][j] != 0 {
             
-            if j <= 2 {
+            if j <= 3 {
                 output[0] += 1
-            } else if j <= 4 {
-                output[1] += 1
             } else if j <= 6 {
+                output[1] += 1
+            } else if j <= 9 {
                 output[2] += 1
             } else {
                 output[3] += 1
@@ -267,6 +270,8 @@ extension JacquardNeoVC: JacquardServiceDelegate {
         }
         if !isGestureActive {
             gestureHistoryConsumtionTimer = Timer.scheduledTimer(withTimeInterval: GESTURE_HISTORY_CONSUMTION_DELAY, repeats: true, block: { (timer) in
+                print("GESTURE HISTORY:", self.gestureHistory)
+
                 if self.gestureHistory.count > 0 {
                     print("GESTURE HISTORY:", self.gestureHistory)
                     
@@ -297,7 +302,7 @@ extension JacquardNeoVC: JacquardServiceDelegate {
                     for i in 1..<self.gestureHistory.count {
                         let start = self.gestureHistory[i-1]
                         let end = self.gestureHistory[i]
-                        print("\(start) >  \(end)")
+//                        print("\(start) >  \(end)")
                         if abs(end - start) != 1 && end != start {
                             if start > end {
                                 //CLOCKWISE
@@ -319,13 +324,13 @@ extension JacquardNeoVC: JacquardServiceDelegate {
 //                        return result + delta
 //                    })
                     print("Delta \(delta)")
-                    switch self.state {
-                    case State.volumeControl:
-                        print(Float(delta)/3.0)
-                        MPVolumeView.setVolume(Float(delta)/3.0)
-                    case State.brightnessControl:
-                        UIScreen.main.brightness = CGFloat(Float(delta)/3.0)
-                    }
+//                    switch self.state {
+//                    case State.volumeControl:
+//                        print(Float(delta)/3.0)
+//                        MPVolumeView.setVolume(Float(delta)/3.0)
+//                    case State.brightnessControl:
+//                        UIScreen.main.brightness = CGFloat(Float(delta)/3.0)
+//                    }
                 }
                 self.gestureHistory.removeAll()
             })
@@ -334,46 +339,33 @@ extension JacquardNeoVC: JacquardServiceDelegate {
         isGestureActive = true
         gestureResetTimer = Timer.scheduledTimer(withTimeInterval: GESTURE_END_DELAY, repeats: false, block: { (timer) in
             print("GESTURE OVER")
+            
             self.isGestureActive = false
             self.gestureHistoryConsumtionTimer?.invalidate()
-//            print("Unique Touch Zones: \(self.uniqueTouchedZones)")
+            print("Unique Touch Zones: \(self.uniqueTouchedZones)")
             if self.uniqueTouchedZones.count == 1 {
                 print("Tapped Zone \(self.uniqueTouchedZones[0])")
+                switch self.uniqueTouchedZones[0] {
+                case TouchZone.Right.rawValue:
+                    self.musicPlayer.skipToNextItem()
+                case TouchZone.Left.rawValue:
+                    self.musicPlayer.skipToPreviousItem()
+                case TouchZone.Bottom.rawValue:
+                    self.musicPlayer.playbackState == .paused ? self.musicPlayer.play() : self.musicPlayer.stop()
+                default:
+                    break
+                }
             }
             self.uniqueTouchedZones.removeAll()
         })
         if threadChunkArray.count == 5 {
             let group = groupDetector(input: &threadChunkArray)
-//            print(group + "\n")
-            switch group {
-            case "Left":
-                gestureHistory.append(1)
-                if !uniqueTouchedZones.contains(1) {
-                    uniqueTouchedZones.append(1)
-                }
-            case "Right":
-                gestureHistory.append(3)
-                if !uniqueTouchedZones.contains(3) {
-                    uniqueTouchedZones.append(3)
-                }
-            case "Center":
-                gestureHistory.append(2)
-                if !uniqueTouchedZones.contains(2) {
-                    uniqueTouchedZones.append(2)
-                }
-            default:
-                break
+//            print("Group: \(group)" + "\n")
+            gestureHistory.append(group.rawValue)
+            if !uniqueTouchedZones.contains(group.rawValue) {
+                uniqueTouchedZones.append(group.rawValue)
             }
-//            if string.count < 3 {
-//                if group != "" {
-//                    if string.last != Character(group) {
-//                        string.append(Character(group))
-//                    }
-//                }
-//            } else {
-//                print(string)
-//                string = ""
-//            }
+            
             threadChunkArray.removeAll(keepingCapacity: false)
         } else {
             threadChunkArray.append(threadArray)

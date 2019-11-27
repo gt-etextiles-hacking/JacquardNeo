@@ -14,6 +14,7 @@
 		4CF9A32023899708009665E8 /* JacquardNeoVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CF9A31F23899708009665E8 /* JacquardNeoVC.swift */; };
 		4CF9A3222389984C009665E8 /* GestureTrie.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CF9A3212389984C009665E8 /* GestureTrie.swift */; };
 		B1D332F78A51415A75857B85 /* Pods_JacquardNeo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F3ACE1A3A884A3539DF2EA3 /* Pods_JacquardNeo.framework */; };
+		B2F91A9F238E34B300050669 /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2F91A9E238E34B300050669 /* Enums.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		4CF9A3212389984C009665E8 /* GestureTrie.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GestureTrie.swift; sourceTree = "<group>"; };
 		4F3ACE1A3A884A3539DF2EA3 /* Pods_JacquardNeo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_JacquardNeo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4F68EDB073DB5FD7A032840D /* Pods-JacquardNeo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-JacquardNeo.release.xcconfig"; path = "Target Support Files/Pods-JacquardNeo/Pods-JacquardNeo.release.xcconfig"; sourceTree = "<group>"; };
+		B2F91A9E238E34B300050669 /* Enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enums.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +72,7 @@
 				4CF9A3142389961C009665E8 /* Assets.xcassets */,
 				4CF9A3162389961C009665E8 /* LaunchScreen.storyboard */,
 				4CF9A3192389961C009665E8 /* Info.plist */,
+				B2F91A9E238E34B300050669 /* Enums.swift */,
 			);
 			path = JacquardNeo;
 			sourceTree = "<group>";
@@ -207,6 +210,7 @@
 			files = (
 				4CF9A32023899708009665E8 /* JacquardNeoVC.swift in Sources */,
 				4CF9A30C2389961A009665E8 /* AppDelegate.swift in Sources */,
+				B2F91A9F238E34B300050669 /* Enums.swift in Sources */,
 				4CF9A30E2389961A009665E8 /* SceneDelegate.swift in Sources */,
 				4CF9A3222389984C009665E8 /* GestureTrie.swift in Sources */,
 			);
@@ -346,7 +350,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = HW2DL7UPC8;
+				DEVELOPMENT_TEAM = U4985LT7P8;
 				INFOPLIST_FILE = JacquardNeo/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -366,7 +370,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = HW2DL7UPC8;
+				DEVELOPMENT_TEAM = U4985LT7P8;
 				INFOPLIST_FILE = JacquardNeo/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
