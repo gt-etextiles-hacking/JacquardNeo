@@ -13,4 +13,5 @@ enum TouchZone: Int {
     case Top = 1
     case Right = 2
     case Bottom = 3
+    case None = -1
 }

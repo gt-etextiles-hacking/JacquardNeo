@@ -34,7 +34,8 @@ class JacquardNeoVC: UIViewController {
     var GESTURE_HISTORY_CONSUMTION_DELAY = 0.4
     var uniqueTouchedZones: [Int] = []
     let musicPlayer = MPMusicPlayerApplicationController.systemMusicPlayer
-
+    let threshold: Float = 0.28
+    
     enum State {
         case volumeControl
         case brightnessControl
@@ -208,20 +209,19 @@ class JacquardNeoVC: UIViewController {
             return TouchZone.Right
         default:
             break
-        
         }
         
-        return TouchZone.Top
+        return TouchZone.None
     }
         
     func dfs(input: inout [[Float]], i: Int, j: Int, output: inout [Float]) {
-        if i >= 0 && i < input.count && j >= 0 && j < input[i].count && input[i][j] != 0 {
-            
+        if i >= 0 && i < input.count && j >= 0 && j < input[i].count && input[i][j] >= threshold && j % 2 != 1 {
+            print("\(j): \(input[i][j])")
             if j <= 3 {
                 output[0] += 1
-            } else if j <= 6 {
+            } else if j <= 7 {
                 output[1] += 1
-            } else if j <= 9 {
+            } else if j <= 10 {
                 output[2] += 1
             } else {
                 output[3] += 1
@@ -236,6 +236,21 @@ class JacquardNeoVC: UIViewController {
         }
     }
     
+}
+
+//Helpers
+extension JacquardNeoVC {
+    func printReading(reading: [Float]) {
+        for i in 0 ..< reading.count {
+            print("\(i)>|\(reading[i])|  ", terminator:"")
+        }
+        print()
+//        for i in 0 ..< reading.count {
+//            print("\(reading[i]) ", terminator:"")
+//        }
+//        print()
+        print()
+    }
 }
 
 extension JacquardNeoVC: JacquardServiceDelegate {
@@ -265,6 +280,10 @@ extension JacquardNeoVC: JacquardServiceDelegate {
     }
     
     func didDetectThreadTouch(threadArray: [Float]) {
+        
+//        print("Array: \n \(threadArray)")
+        printReading(reading: threadArray)
+        
         if let gestureResetTimer = gestureResetTimer {
             gestureResetTimer.invalidate()
         }
@@ -272,10 +291,10 @@ extension JacquardNeoVC: JacquardServiceDelegate {
             gestureHistoryConsumtionTimer = Timer.scheduledTimer(withTimeInterval: GESTURE_HISTORY_CONSUMTION_DELAY, repeats: true, block: { (timer) in
                 print("GESTURE HISTORY:", self.gestureHistory)
 
-                if self.gestureHistory.count > 0 {
-                    print("GESTURE HISTORY:", self.gestureHistory)
-                    
-                }
+//                if self.gestureHistory.count > 0 {
+//                    print("GESTURE HISTORY:", self.gestureHistory)
+//
+//                }
                 if NSSet(array: self.gestureHistory).count > 1 {
                     
 //                    if self.direction == .none {
@@ -347,11 +366,15 @@ extension JacquardNeoVC: JacquardServiceDelegate {
                 print("Tapped Zone \(self.uniqueTouchedZones[0])")
                 switch self.uniqueTouchedZones[0] {
                 case TouchZone.Right.rawValue:
-                    self.musicPlayer.skipToNextItem()
+                    if self.musicPlayer.playbackState == .playing {
+                        self.musicPlayer.skipToNextItem()
+                    }
                 case TouchZone.Left.rawValue:
-                    self.musicPlayer.skipToPreviousItem()
+                    if self.musicPlayer.playbackState == .playing {
+                        self.musicPlayer.skipToPreviousItem()
+                    }
                 case TouchZone.Bottom.rawValue:
-                    self.musicPlayer.playbackState == .paused ? self.musicPlayer.play() : self.musicPlayer.stop()
+                    self.musicPlayer.playbackState == .paused || self.musicPlayer.playbackState == .stopped ? self.musicPlayer.play() : self.musicPlayer.stop()
                 default:
                     break
                 }
@@ -361,11 +384,12 @@ extension JacquardNeoVC: JacquardServiceDelegate {
         if threadChunkArray.count == 5 {
             let group = groupDetector(input: &threadChunkArray)
 //            print("Group: \(group)" + "\n")
-            gestureHistory.append(group.rawValue)
-            if !uniqueTouchedZones.contains(group.rawValue) {
-                uniqueTouchedZones.append(group.rawValue)
+            if group != .None {
+                gestureHistory.append(group.rawValue)
+                if !uniqueTouchedZones.contains(group.rawValue) {
+                    uniqueTouchedZones.append(group.rawValue)
+                }
             }
-            
             threadChunkArray.removeAll(keepingCapacity: false)
         } else {
             threadChunkArray.append(threadArray)
