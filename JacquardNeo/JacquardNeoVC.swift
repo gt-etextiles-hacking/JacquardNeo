@@ -34,7 +34,7 @@ class JacquardNeoVC: UIViewController {
     var GESTURE_HISTORY_CONSUMTION_DELAY = 0.4
     var uniqueTouchedZones: [Int] = []
     let musicPlayer = MPMusicPlayerApplicationController.systemMusicPlayer
-    let threshold: Float = 0.28
+    let threshold: Float = 0.8
     
     enum State {
         case volumeControl
@@ -216,7 +216,6 @@ class JacquardNeoVC: UIViewController {
         
     func dfs(input: inout [[Float]], i: Int, j: Int, output: inout [Float]) {
         if i >= 0 && i < input.count && j >= 0 && j < input[i].count && input[i][j] >= threshold && j % 2 != 1 {
-            print("\(j): \(input[i][j])")
             if j <= 3 {
                 output[0] += 1
             } else if j <= 7 {
@@ -241,6 +240,8 @@ class JacquardNeoVC: UIViewController {
 //Helpers
 extension JacquardNeoVC {
     func printReading(reading: [Float]) {
+        print(reading)
+        return
         for i in 0 ..< reading.count {
             print("\(i)>|\(reading[i])|  ", terminator:"")
         }
@@ -282,14 +283,13 @@ extension JacquardNeoVC: JacquardServiceDelegate {
     func didDetectThreadTouch(threadArray: [Float]) {
         
 //        print("Array: \n \(threadArray)")
-        printReading(reading: threadArray)
+//        printReading(reading: threadArray)
         
         if let gestureResetTimer = gestureResetTimer {
             gestureResetTimer.invalidate()
         }
         if !isGestureActive {
             gestureHistoryConsumtionTimer = Timer.scheduledTimer(withTimeInterval: GESTURE_HISTORY_CONSUMTION_DELAY, repeats: true, block: { (timer) in
-                print("GESTURE HISTORY:", self.gestureHistory)
 
 //                if self.gestureHistory.count > 0 {
 //                    print("GESTURE HISTORY:", self.gestureHistory)
@@ -342,13 +342,23 @@ extension JacquardNeoVC: JacquardServiceDelegate {
 //                    let delta = diff.reduce(0, { (result, delta) -> Int in
 //                        return result + delta
 //                    })
-                    print("Delta \(delta)")
+//                    print("Delta \(delta)")
 //                    switch self.state {
 //                    case State.volumeControl:
 //                        print(Float(delta)/3.0)
 //                        MPVolumeView.setVolume(Float(delta)/3.0)
 //                    case State.brightnessControl:
 //                        UIScreen.main.brightness = CGFloat(Float(delta)/3.0)
+//                    }
+                    
+                    let volumeView = MPVolumeView()
+                    let slider = volumeView.subviews.first(where: { $0 is UISlider }) as? UISlider
+                    MPVolumeView.setVolume(min(max(slider!.value + Float(delta)/5,0),1))
+
+//                    DispatchQueue.main.async {
+//                        print("Old Val + Delta \(slider!.value + Float(delta)/5)")
+//                        print("Volume: \(min(max(slider!.value + Float(delta)/5,0),1))")
+////                        slider?.value = min(max(slider!.value + Float(delta)/5,0),1)
 //                    }
                 }
                 self.gestureHistory.removeAll()
@@ -357,13 +367,12 @@ extension JacquardNeoVC: JacquardServiceDelegate {
         
         isGestureActive = true
         gestureResetTimer = Timer.scheduledTimer(withTimeInterval: GESTURE_END_DELAY, repeats: false, block: { (timer) in
-            print("GESTURE OVER")
+//            print("GESTURE OVER")
             
             self.isGestureActive = false
             self.gestureHistoryConsumtionTimer?.invalidate()
-            print("Unique Touch Zones: \(self.uniqueTouchedZones)")
             if self.uniqueTouchedZones.count == 1 {
-                print("Tapped Zone \(self.uniqueTouchedZones[0])")
+//                print("Tapped Zone \(self.uniqueTouchedZones[0])")
                 switch self.uniqueTouchedZones[0] {
                 case TouchZone.Right.rawValue:
                     if self.musicPlayer.playbackState == .playing {
